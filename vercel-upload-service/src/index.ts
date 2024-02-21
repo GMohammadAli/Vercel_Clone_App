@@ -33,10 +33,13 @@ app.post("/deploy", async (req, res) => {
     //using redisQueue i.e adding the id to redis queue for deployment service to access
     publisher.lPush("redis-build-queue", projectID);
 
+    //updating the status of the project to uploaded to provide User the info regarding the project upload
+    publisher.hSet("redis-project-status", projectID, "uploaded");
+
     //implement sqs queue
     res.json({
         id: projectID
     });
 });
 
-app.listen(3000);
+app.listen(3001);

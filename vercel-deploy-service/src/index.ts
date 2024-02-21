@@ -5,6 +5,10 @@ import { buildProject } from "./build";
 const subscriber = createClient();
 subscriber.connect();
 
+//you can't publish and subscribe using the same client in redis i.e only get or only set
+const publisher = createClient();
+publisher.connect();
+
 const main = async () => {
     while(1) {
         const res = await subscriber.brPop(
@@ -23,6 +27,10 @@ const main = async () => {
         await buildProject(projectID);
         //upload the created build i.e dist folder to the s3 bucket
         copyAndUploadFinalBuild(projectID); 
+        //check if the build command is storing the outputs in build only and not dist
+
+        //updating the status of the project to deployed to provide User the info regarding the deployment
+        publisher.hSet("redis-project-status", projectID, "deployed");
     }
 }
 
